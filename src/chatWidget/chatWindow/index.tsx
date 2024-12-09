@@ -125,11 +125,21 @@ export default function ChatWindow({
                 });
               })
             } else {
-              addMessage({
-                message: "Multiple outputs were detected in the response. Please, define the output_component to specify the intended response.",
-                isSend: false,
-                error: true,
-              });
+              flowOutputs
+                .sort((a, b) => {
+                  // Get the earliest timestamp from each flowOutput's outputs
+                  const aTimestamp = Math.min(...Object.values(a.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
+                  const bTimestamp = Math.min(...Object.values(b.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
+                  return aTimestamp - bTimestamp; // Sort descending (newest first)
+                })
+                .forEach((flowOutput) => {
+                  Object.values(flowOutput.outputs).forEach((output: any) => {
+                    addMessage({
+                      message: extractMessageFromOutput(output),
+                      isSend: false,
+                    });
+                  });
+                });
             }
           }
           if (res.data && res.data.session_id) {
@@ -171,11 +181,11 @@ export default function ChatWindow({
   /* Refocus the User input whenever a new response is returned from the LLM */
 
   useEffect(() => {
-      // after a slight delay
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-  }, [messages,open]);
+    // after a slight delay
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+  }, [messages, open]);
 
   return (
     <div
