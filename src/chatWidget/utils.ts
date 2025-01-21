@@ -67,8 +67,10 @@ export function getAnimationOrigin(position?:string) {
 }
 
 export function extractMessageFromOutput(output:{type:string, message:any}){
+	console.log(output)
 	const {type, message} = output;
 	if(type === "text") return message;
+	if (type ==="message") return message.text;
 	if(type==="object") return message.text;
-	return "Unknow message structure"
+	return "Unknown message structure"
 }
