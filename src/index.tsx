@@ -19,6 +19,8 @@ customElements.define('langflow-chat', r2wc(ChatWidget, {
         bot_message_style:"json",
         user_message_style:"json",
         chat_window_style:"json",
+        messages_container_style:"json",
+        header_style:"json",
         height:"number",
         width:"number",
         session_id:"string",

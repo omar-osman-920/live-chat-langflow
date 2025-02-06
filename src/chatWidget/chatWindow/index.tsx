@@ -19,6 +19,8 @@ export default function ChatWindow({
   send_icon_style,
   user_message_style,
   chat_window_style,
+  messages_container_style,
+  header_style,
   error_message_style,
   placeholder_sending,
   send_button_style,
@@ -47,6 +49,8 @@ export default function ChatWindow({
   send_icon_style?: React.CSSProperties;
   user_message_style?: React.CSSProperties;
   chat_window_style?: React.CSSProperties;
+  messages_container_style?: React.CSSProperties;
+  header_style?: React.CSSProperties;
   error_message_style?: React.CSSProperties;
   send_button_style?: React.CSSProperties;
   online?: boolean;
@@ -201,7 +205,10 @@ export default function ChatWindow({
         ref={ref}
         className="cl-window"
       >
-        <div className="cl-header">
+        <div 
+          style={header_style}
+          className="cl-header"
+        >
           {window_title}
           <div className="cl-header-subtitle">
             {online ? (
@@ -217,7 +224,10 @@ export default function ChatWindow({
             )}
           </div>
         </div>
-        <div className="cl-messages_container">
+        <div 
+          style={messages_container_style}
+          className="cl-messages_container"
+        >
           {messages.map((message, index) => (
             <ChatMessage
               bot_message_style={bot_message_style}

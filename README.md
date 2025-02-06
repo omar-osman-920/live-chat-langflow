@@ -102,6 +102,8 @@ Use the widget API to customize your widget:
 | chat_position         | string    | No       |
 | chat_trigger_style    | json      | No       |
 | chat_window_style     | json      | No       |
+| messages_container_style | json   | No       |
+| header_style          | json      | No       |
 | output_type           | string    | No       |
 | input_type            | string    | No       |
 | output_component      | string    | No       |
@@ -165,6 +167,16 @@ Use the widget API to customize your widget:
   - Type: JSON
   - Required: No
   - Description: Styling options for the overall chat window.
+
+- **messages_container_style:**
+  - Type: JSON
+  - Required: No
+  - Description: Styling options for the messages container in the chat window.
+
+- **header_style:**
+  - Type: JSON
+  - Required: No
+  - Description: Styling options for the header of the chat window.
 
 - **error_message_style:**
   - Type: JSON

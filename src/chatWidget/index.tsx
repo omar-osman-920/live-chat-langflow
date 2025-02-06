@@ -17,6 +17,8 @@ export default function ChatWidget({
   bot_message_style,
   user_message_style,
   chat_window_style,
+  messages_container_style,
+  header_style,
   height,
   width,
   error_message_style,
@@ -45,6 +47,8 @@ export default function ChatWidget({
   bot_message_style?: React.CSSProperties;
   user_message_style?: React.CSSProperties;
   chat_window_style?: React.CSSProperties;
+  messages_container_style?: React.CSSProperties;
+  header_style?: React.CSSProperties;
   online?: boolean;
   online_message?: string;
   offline_message?: string;
@@ -2159,6 +2163,8 @@ input::-ms-input-placeholder { /* Microsoft Edge */
         bot_message_style={bot_message_style}
         user_message_style={user_message_style}
         chat_window_style={chat_window_style}
+        messages_container_style={messages_container_style}
+        header_style={header_style}
         error_message_style={error_message_style}
         send_button_style={send_button_style}
         placeholder={placeholder}
