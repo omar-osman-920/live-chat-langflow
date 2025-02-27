@@ -124,6 +124,7 @@ Use the widget API to customize your widget:
 | window_title          | string    | No       |
 | session_id            | string    | No       |
 | additional_headers    | json      | No       |
+| message_list          | json      | No       |
 
 - **api_key:**
   - Type: String
@@ -261,6 +262,10 @@ Use the widget API to customize your widget:
   - Required: No
   - Description: Additional headers to be sent to Langflow server
 
+- **message_list:**
+  - Type: JSON
+  - Required: No
+  - Description: Chat message list. eg. [{"message": string ,"isSend": boolean }]
 
 ## Live example:
 Try out or [live example](https://codesandbox.io/s/langflow-embedded-chat-example-dv9zpx) to see how the Langflow Embedded Chat ⛓️ works. 
