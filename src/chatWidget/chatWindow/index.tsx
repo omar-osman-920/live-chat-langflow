@@ -1,6 +1,6 @@
 import { Send } from "lucide-react";
 import { extractMessageFromOutput, getAnimationOrigin, getChatPosition } from "../utils";
-import React, { useEffect, useRef, useState, MouseEvent } from "react";
+import React, { useEffect, useRef, useState, MouseEvent, useCallback } from "react";
 import { ChatMessageType } from "../../types/chatWidget";
 import ChatMessage from "./chatMessage";
 import { sendMessage } from "../../controllers";
@@ -205,8 +205,46 @@ export default function ChatWindow({
     }, 100);
   }, [messages, open]);
 
-  // Resize event handlers
-  const handleResizeStart = (e: MouseEvent<HTMLDivElement>) => {
+  // Define resize handlers with useCallback to prevent unnecessary re-renders
+  const handleResizeMove = useCallback((e: MouseEvent | any) => {
+    if (!isResizing) return;
+    
+    // Calculate the change in mouse position
+    const deltaX = e.clientX - resizeStartPos.current.x;
+    const deltaY = e.clientY - resizeStartPos.current.y;
+    
+    // Calculate new dimensions
+    let newWidth = initialSize.current.width + deltaX;
+    let newHeight = initialSize.current.height + deltaY;
+    
+    // Apply min/max constraints
+    newWidth = Math.max(min_width || 300, Math.min(max_width || 2000, newWidth));
+    newHeight = Math.max(min_height || 400, Math.min(max_height || 2000, newHeight));
+    
+    setCurrentWidth(newWidth);
+    setCurrentHeight(newHeight);
+  }, [isResizing, min_width, max_width, min_height, max_height]);
+  
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    
+    // Clean up event listeners
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeEnd);
+  }, [handleResizeMove]);
+  
+  // Add a useEffect to manage event listener cleanup
+  useEffect(() => {
+    const currentHandleResizeMove = handleResizeMove;
+    const currentHandleResizeEnd = handleResizeEnd;
+    
+    return () => {
+      document.removeEventListener('mousemove', currentHandleResizeMove);
+      document.removeEventListener('mouseup', currentHandleResizeEnd);
+    };
+  }, [handleResizeMove, handleResizeEnd]);
+  
+  const handleResizeStart = useCallback((e: MouseEvent<HTMLDivElement>) => {
     if (!resizable) return;
     
     e.preventDefault();
@@ -227,42 +265,9 @@ export default function ChatWindow({
     // Add resize event listeners
     document.addEventListener('mousemove', handleResizeMove);
     document.addEventListener('mouseup', handleResizeEnd);
-  };
+  }, [resizable, currentWidth, currentHeight, width, height, handleResizeMove, handleResizeEnd]);
   
-  const handleResizeMove = (e: MouseEvent | any) => {
-    if (!isResizing) return;
-    
-    // Calculate the change in mouse position
-    const deltaX = e.clientX - resizeStartPos.current.x;
-    const deltaY = e.clientY - resizeStartPos.current.y;
-    
-    // Calculate new dimensions
-    let newWidth = initialSize.current.width + deltaX;
-    let newHeight = initialSize.current.height + deltaY;
-    
-    // Apply min/max constraints
-    newWidth = Math.max(min_width || 300, Math.min(max_width || 2000, newWidth));
-    newHeight = Math.max(min_height || 400, Math.min(max_height || 2000, newHeight));
-    
-    setCurrentWidth(newWidth);
-    setCurrentHeight(newHeight);
-  };
-  
-  const handleResizeEnd = () => {
-    setIsResizing(false);
-    
-    // Clean up event listeners
-    document.removeEventListener('mousemove', handleResizeMove);
-    document.removeEventListener('mouseup', handleResizeEnd);
-  };
-  
-  // Add resize event listeners on mount and remove on unmount
-  useEffect(() => {
-    return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
-    };
-  }, [handleResizeMove, handleResizeEnd]);
+  // The cleanup for event listeners is now handled in the useEffect above
   
 
   return (
