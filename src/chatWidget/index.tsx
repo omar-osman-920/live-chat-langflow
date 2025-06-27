@@ -33,6 +33,11 @@ export default function ChatWidget({
   additional_headers,
   session_id,
   start_open=false,
+  resizable=false,
+  min_width,
+  min_height,
+  max_width,
+  max_height,
 }: {
   api_key?: string;
   input_value: string,
@@ -63,6 +68,11 @@ export default function ChatWidget({
   additional_headers?: { [key: string]: string };
   session_id?: string;
   start_open?: boolean;
+  resizable?: boolean;
+  min_width?: number;
+  min_height?: number;
+  max_width?: number;
+  max_height?: number;
 }) {
   const [open, setOpen] = useState(start_open);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -905,6 +915,23 @@ video {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+} 
+
+.cl-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, #3b82f6 50%);
+  border-bottom-right-radius: 5px;
+  z-index: 10;
+}
+
+.cl-window.resizable {
+  resize: both;
+  overflow: hidden !important;
 } 
 input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: rgb(156 163 175);
@@ -2179,6 +2206,11 @@ input::-ms-input-placeholder { /* Microsoft Edge */
         position={chat_position}
         sessionId={sessionId}
         additional_headers={additional_headers}
+        resizable={resizable}
+        min_width={min_width}
+        min_height={min_height}
+        max_width={max_width}
+        max_height={max_height}
       />
     </div>
   );
