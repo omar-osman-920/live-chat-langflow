@@ -88,6 +88,12 @@ export default function ChatWindow({
   const [windowPosition, setWindowPosition] = useState({ left: "0", top: "0" });
   const inputRef = useRef<HTMLInputElement>(null); /* User input Ref */
   
+  // Default dimension constraints
+  const DEFAULT_MIN_WIDTH = 300;
+  const DEFAULT_MIN_HEIGHT = 400;
+  const DEFAULT_MAX_WIDTH = 2000;
+  const DEFAULT_MAX_HEIGHT = 2000;
+
   // Resize state variables
   const [isResizing, setIsResizing] = useState(false);
   const [currentWidth, setCurrentWidth] = useState(width);
@@ -218,13 +224,13 @@ export default function ChatWindow({
     let newHeight = initialSize.current.height + deltaY;
     
     // Apply min/max constraints
-    newWidth = Math.max(min_width || 300, Math.min(max_width || 2000, newWidth));
-    newHeight = Math.max(min_height || 400, Math.min(max_height || 2000, newHeight));
+    newWidth = Math.max(min_width || DEFAULT_MIN_WIDTH, Math.min(max_width || DEFAULT_MAX_WIDTH, newWidth));
+    newHeight = Math.max(min_height || DEFAULT_MIN_HEIGHT, Math.min(max_height || DEFAULT_MAX_HEIGHT, newHeight));
     
     setCurrentWidth(newWidth);
     setCurrentHeight(newHeight);
   }, [isResizing, min_width, max_width, min_height, max_height]);
-  
+
   const handleResizeEnd = useCallback(() => {
     setIsResizing(false);
     
@@ -269,6 +275,14 @@ export default function ChatWindow({
   
   // The cleanup for event listeners is now handled in the useEffect above
   
+  // Force resize to min dimensions when resizing starts to ensure constraints are applied from the beginning
+  useEffect(() => {
+    if (isResizing) {
+      // Apply min/max constraints immediately when resizing starts
+      setCurrentWidth(prev => Math.max(min_width || DEFAULT_MIN_WIDTH, Math.min(max_width || DEFAULT_MAX_WIDTH, prev)));
+      setCurrentHeight(prev => Math.max(min_height || DEFAULT_MIN_HEIGHT, Math.min(max_height || DEFAULT_MAX_HEIGHT, prev)));
+    }
+  }, [isResizing, min_width, min_height, max_width, max_height]);
 
   return (
     <div
@@ -286,7 +300,11 @@ export default function ChatWindow({
           height: currentHeight || height,
           position: "relative",
           resize: resizable ? "both" : "none",
-          overflow: "hidden"
+          overflow: "hidden",
+          minWidth: min_width || DEFAULT_MIN_WIDTH,
+          minHeight: min_height || DEFAULT_MIN_HEIGHT,
+          maxWidth: max_width || DEFAULT_MAX_WIDTH,
+          maxHeight: max_height || DEFAULT_MAX_HEIGHT
         }}
         ref={ref}
         className={`cl-window ${resizable ? 'resizable' : ''}`}
