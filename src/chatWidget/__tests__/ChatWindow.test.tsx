@@ -112,5 +112,32 @@ describe('ChatWindow Component', () => {
     // Initial size should match props
     expect(chatWindow.style.width).toBe('500px');
     expect(chatWindow.style.height).toBe('600px');
+
+    // Check if min/max constraints are applied
+    expect(chatWindow.style.minWidth).toBe('300px');
+    expect(chatWindow.style.minHeight).toBe('400px');
+    expect(chatWindow.style.maxWidth).toBe('800px');
+    expect(chatWindow.style.maxHeight).toBe('900px');
+  });
+
+  test('uses default constraints when min/max not provided', () => {
+    render(
+      <ChatWindow
+        {...defaultProps}
+        resizable={true}
+        width={500}
+        height={600}
+      />
+    );
+
+    // Get the chat window element
+    const chatWindow = document.querySelector('.cl-window') as HTMLElement;
+    expect(chatWindow).toBeInTheDocument();
+
+    // Should use default constraints
+    expect(chatWindow.style.minWidth).toBe('300px');
+    expect(chatWindow.style.minHeight).toBe('400px');
+    expect(chatWindow.style.maxWidth).toBe('2000px');
+    expect(chatWindow.style.maxHeight).toBe('2000px');
   });
 });
