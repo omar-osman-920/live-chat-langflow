@@ -111,7 +111,12 @@ Use the widget API to customize your widget:
 | host_url              | string    | Yes      |
 | input_container_style | json      | No       |
 | input_style           | json      | No       |
+| max_height            | number    | No       |
+| max_width             | number    | No       |
+| min_height            | number    | No       |
+| min_width             | number    | No       |
 | online                | boolean   | No       |
+| resizable             | boolean   | No       |
 | start_open            | boolean   | No       |
 | online_message        | string    | No       |
 | placeholder           | string    | No       |
@@ -241,6 +246,36 @@ Use the widget API to customize your widget:
   - Required: No
   - Description: Styling options for formatting user messages in the chat window.
 
+- **resizable:**
+  - Type: Boolean
+  - Required: No
+  - Default: false
+  - Description: Enables or disables the ability to resize the chat window.
+
+- **min_width:**
+  - Type: Number
+  - Required: No
+  - Default: 300
+  - Description: Specifies the minimum width in pixels when resizing the chat window.
+
+- **min_height:**
+  - Type: Number
+  - Required: No
+  - Default: 400
+  - Description: Specifies the minimum height in pixels when resizing the chat window.
+
+- **max_width:**
+  - Type: Number
+  - Required: No
+  - Default: 2000
+  - Description: Specifies the maximum width in pixels when resizing the chat window.
+
+- **max_height:**
+  - Type: Number
+  - Required: No
+  - Default: 2000
+  - Description: Specifies the maximum height in pixels when resizing the chat window.
+
 - **width:**
   - Type: Number
   - Required: No
@@ -261,14 +296,40 @@ Use the widget API to customize your widget:
   - Required: No
   - Description: Additional headers to be sent to Langflow server
 
+## Contributing
+Contributions are welcome! Please follow the details below on how to get started.
+1. Fork the repository and clone it to your local machine.
+2. Install the dependencies:
+   ```bash
+   npm install
+   (or)
+   npm install --legacy-peer-deps
+   ```
+3. Make your changes and ensure everything is working as expected:
+   ```bash
+   npm run build
+   npm start
+   ```
+4. Run the tests to ensure nothing is broken:
+   ```bash
+   npm test
+   ```
+5. Commit your changes and push them to your forked repository.
+6. Open a pull request to the main repository.
 
-## Live example:
+## Live example
 Try out or [live example](https://codesandbox.io/s/langflow-embedded-chat-example-dv9zpx) to see how the Langflow Embedded Chat ⛓️ works. 
 
-1. first create a Flow and save it using [Langflow ⛓️](https://github.com/logspace-ai/langflow).
+1. First create a Flow and save it using [Langflow ⛓️](https://github.com/logspace-ai/langflow).
 2. Get the hosted URL to use in the live example.
 3. If you are using a public host (like [Hugging Face Spaces](https://huggingface.co/spaces/Logspace/Langflow)) use tweaks to keep your API keys safe.
 
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE](https://github.com/logspace-ai/langflow-embedded-chat/tree/main/LICENSE) file for details.
+
+## ❤️ Contributors
+
+[![langflow contributors](https://contrib.rocks/image?repo=langflow-ai/langflow-embedded-chat)](https://github.com/langflow-ai/langflow-embedded-chat/graphs/contributors)
+
+---
