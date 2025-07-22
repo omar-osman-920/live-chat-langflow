@@ -1,6 +1,6 @@
 import { Send } from "lucide-react";
 import { extractMessageFromOutput, getAnimationOrigin, getChatPosition } from "../utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, MouseEvent, useCallback } from "react";
 import { ChatMessageType } from "../../types/chatWidget";
 import ChatMessage from "./chatMessage";
 import { sendMessage } from "../../controllers";
@@ -37,7 +37,12 @@ export default function ChatWindow({
   height = 650,
   tweaks,
   sessionId,
-  additional_headers
+  additional_headers,
+  resizable = false,
+  min_width = 300,
+  min_height = 400,
+  max_width = 800,
+  max_height = 900
 }: {
   api_key?: string;
   output_type: string,
@@ -70,6 +75,11 @@ export default function ChatWindow({
   height?: number;
   sessionId: React.MutableRefObject<string>;
   additional_headers?: { [key: string]: string };
+  resizable?: boolean;
+  min_width?: number;
+  min_height?: number;
+  max_width?: number;
+  max_height?: number;
 
 }) {
   const [value, setValue] = useState<string>("");
@@ -77,6 +87,20 @@ export default function ChatWindow({
   const lastMessage = useRef<HTMLDivElement>(null);
   const [windowPosition, setWindowPosition] = useState({ left: "0", top: "0" });
   const inputRef = useRef<HTMLInputElement>(null); /* User input Ref */
+  
+  // Default dimension constraints
+  const DEFAULT_MIN_WIDTH = 300;
+  const DEFAULT_MIN_HEIGHT = 400;
+  const DEFAULT_MAX_WIDTH = 2000;
+  const DEFAULT_MAX_HEIGHT = 2000;
+
+  // Resize state variables
+  const [isResizing, setIsResizing] = useState(false);
+  const [currentWidth, setCurrentWidth] = useState(width);
+  const [currentHeight, setCurrentHeight] = useState(height);
+  const resizeStartPos = useRef({ x: 0, y: 0 });
+  const initialSize = useRef({ width: width, height: height });
+  
   useEffect(() => {
     if (triggerRef)
       setWindowPosition(
@@ -187,6 +211,79 @@ export default function ChatWindow({
     }, 100);
   }, [messages, open]);
 
+  // Define resize handlers with useCallback to prevent unnecessary re-renders
+  const handleResizeMove = useCallback((e: MouseEvent | any) => {
+    if (!isResizing) return;
+    
+    // Calculate the change in mouse position
+    const deltaX = e.clientX - resizeStartPos.current.x;
+    const deltaY = e.clientY - resizeStartPos.current.y;
+    
+    // Calculate new dimensions
+    let newWidth = initialSize.current.width + deltaX;
+    let newHeight = initialSize.current.height + deltaY;
+    
+    // Apply min/max constraints
+    newWidth = Math.max(min_width || DEFAULT_MIN_WIDTH, Math.min(max_width || DEFAULT_MAX_WIDTH, newWidth));
+    newHeight = Math.max(min_height || DEFAULT_MIN_HEIGHT, Math.min(max_height || DEFAULT_MAX_HEIGHT, newHeight));
+    
+    setCurrentWidth(newWidth);
+    setCurrentHeight(newHeight);
+  }, [isResizing, min_width, max_width, min_height, max_height]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    
+    // Clean up event listeners
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeEnd);
+  }, [handleResizeMove]);
+  
+  // Add a useEffect to manage event listener cleanup
+  useEffect(() => {
+    const currentHandleResizeMove = handleResizeMove;
+    const currentHandleResizeEnd = handleResizeEnd;
+    
+    return () => {
+      document.removeEventListener('mousemove', currentHandleResizeMove);
+      document.removeEventListener('mouseup', currentHandleResizeEnd);
+    };
+  }, [handleResizeMove, handleResizeEnd]);
+  
+  const handleResizeStart = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    if (!resizable) return;
+    
+    e.preventDefault();
+    setIsResizing(true);
+    
+    // Store initial mouse position
+    resizeStartPos.current = {
+      x: e.clientX,
+      y: e.clientY
+    };
+    
+    // Store initial size
+    initialSize.current = {
+      width: currentWidth || width,
+      height: currentHeight || height
+    };
+    
+    // Add resize event listeners
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+  }, [resizable, currentWidth, currentHeight, width, height, handleResizeMove, handleResizeEnd]);
+  
+  // The cleanup for event listeners is now handled in the useEffect above
+  
+  // Force resize to min dimensions when resizing starts to ensure constraints are applied from the beginning
+  useEffect(() => {
+    if (isResizing) {
+      // Apply min/max constraints immediately when resizing starts
+      setCurrentWidth(prev => Math.max(min_width || DEFAULT_MIN_WIDTH, Math.min(max_width || DEFAULT_MAX_WIDTH, prev)));
+      setCurrentHeight(prev => Math.max(min_height || DEFAULT_MIN_HEIGHT, Math.min(max_height || DEFAULT_MAX_HEIGHT, prev)));
+    }
+  }, [isResizing, min_width, min_height, max_width, max_height]);
+
   return (
     <div
       className={
@@ -197,10 +294,27 @@ export default function ChatWindow({
       style={{ ...windowPosition, zIndex: 9999 }}
     >
       <div
-        style={{ ...chat_window_style, width: width, height: height }}
+        style={{ 
+          ...chat_window_style, 
+          width: currentWidth || width, 
+          height: currentHeight || height,
+          position: "relative",
+          resize: resizable ? "both" : "none",
+          overflow: "hidden",
+          minWidth: min_width || DEFAULT_MIN_WIDTH,
+          minHeight: min_height || DEFAULT_MIN_HEIGHT,
+          maxWidth: max_width || DEFAULT_MAX_WIDTH,
+          maxHeight: max_height || DEFAULT_MAX_HEIGHT
+        }}
         ref={ref}
-        className="cl-window"
+        className={`cl-window ${resizable ? 'resizable' : ''}`}
       >
+        {resizable && (
+          <div 
+            className="cl-resize-handle"
+            onMouseDown={handleResizeStart}
+          />
+        )}
         <div className="cl-header">
           {window_title}
           <div className="cl-header-subtitle">

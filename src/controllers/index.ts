@@ -17,7 +17,7 @@ export async function sendMessage(baseUrl: string, flowId: string, message: stri
         headers = Object.assign(headers, additional_headers);
         // headers = {...headers, ...additional_headers};
     }
-    if(sessionId.current && sessionId.current!=""){
+    if(sessionId.current && sessionId.current!==""){
         data.session_id=sessionId.current;
     }
     let response = axios.post(`${baseUrl}/api/v1/run/${flowId}`, data,{headers});

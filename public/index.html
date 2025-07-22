@@ -3,13 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Langflow Chat Demo</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+        }
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .demo-description {
+            margin-bottom: 20px;
+            color: #666;
+        }
+    </style>
 </head>
-<body style="width: 100vh; height: 100vh; ">
-        <langflow-chat window_title="Langflow Chat" 
-        flow_id="4317421c-d4b5-4a22-bc7b-05e8af053b0e"
-        host_url="http://localhost:7860"
-        width="700"
+<body>
+    <h1>Langflow Chat Widget Demo</h1>
+    
+    <div class="demo-section">
+        <h2>Standard Chat Widget</h2>
+        <div class="demo-description">
+            Default chat widget with fixed dimensions.
+        </div>
+        <langflow-chat 
+            window_title="Standard Chat" 
+            flow_id="4317421c-d4b5-4a22-bc7b-05e8af053b0e"
+            host_url="http://localhost:7860"
+            width="450"
+            height="650"
         ></langflow-chat>
+    </div>
+    
+    <div class="demo-section">
+        <h2>Resizable Chat Widget</h2>
+        <div class="demo-description">
+            Resizable chat widget - users can drag the bottom-right corner to resize.
+        </div>
+        <langflow-chat 
+            window_title="Resizable Chat" 
+            flow_id="4317421c-d4b5-4a22-bc7b-05e8af053b0e"
+            host_url="http://localhost:7860"
+            width="500"
+            height="600"
+            resizable="true"
+            min_width="300"
+            min_height="400"
+            max_width="800"
+            max_height="900"
+        ></langflow-chat>
+    </div>
 </body>
 </html>
