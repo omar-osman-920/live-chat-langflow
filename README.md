@@ -97,7 +97,9 @@ Use the widget API to customize your widget:
 
 | Prop                  | Type      | Required |
 |-----------------------|-----------|----------|
-| api_key               | string    | No       |
+| api_key               | string    | Yes      |
+| flow_id               | string    | Yes      |
+| host_url              | string    | Yes      |
 | bot_message_style     | json      | No       |
 | chat_position         | string    | No       |
 | chat_trigger_style    | json      | No       |
@@ -106,9 +108,7 @@ Use the widget API to customize your widget:
 | input_type            | string    | No       |
 | output_component      | string    | No       |
 | error_message_style   | json      | No       |
-| flow_id               | string    | Yes      |
 | height                | number    | No       |
-| host_url              | string    | Yes      |
 | input_container_style | json      | No       |
 | input_style           | json      | No       |
 | online                | boolean   | No       |
