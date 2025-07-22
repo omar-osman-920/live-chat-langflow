@@ -97,7 +97,9 @@ Use the widget API to customize your widget:
 
 | Prop                  | Type      | Required |
 |-----------------------|-----------|----------|
-| api_key               | string    | No       |
+| api_key               | string    | Yes      |
+| flow_id               | string    | Yes      |
+| host_url              | string    | Yes      |
 | bot_message_style     | json      | No       |
 | chat_position         | string    | No       |
 | chat_trigger_style    | json      | No       |
@@ -106,9 +108,7 @@ Use the widget API to customize your widget:
 | input_type            | string    | No       |
 | output_component      | string    | No       |
 | error_message_style   | json      | No       |
-| flow_id               | string    | Yes      |
 | height                | number    | No       |
-| host_url              | string    | Yes      |
 | input_container_style | json      | No       |
 | input_style           | json      | No       |
 | max_height            | number    | No       |
@@ -130,171 +130,202 @@ Use the widget API to customize your widget:
 | session_id            | string    | No       |
 | additional_headers    | json      | No       |
 
-- **api_key:**
-  - Type: String
-  - Required: No
-  - Description: X-API-Key header to send to Langflow
+**api_key:**
+- Type: String
+- Required: Yes
+- Description: X-API-Key header to send to Langflow
+- Example: "sk-1234567890abcdef"
 
+**bot_message_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for formatting bot messages in the chat window.
+- Example: `{ "color": "#333", "backgroundColor": "#f0f0f0" }`
 
-- **bot_message_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for formatting bot messages in the chat window.
+**input_type:**
+- Type: String
+- Required: No
+- Description: Specifies the input type for chat messages.
+- Example: "text"
 
-- **input_type:**
-  - Type: String
-  - Required: No
-  - Description: Specifies the input type for chat messages.
+**output_type:**
+- Type: String
+- Required: No
+- Description: Specifies the output type for chat messages.
+- Example: "text"
 
-- **output_type:**
-  - Type: String
-  - Required: No
-  - Description: Specifies the output type for chat messages.
+**output_component:**
+- Type: String
+- Required: No
+- Description: Specify the output ID for chat messages; this is necessary when multiple outputs are present.
+- Example: "output_1"
 
-- **output_component:**
-  - Type: String
-  - Required: No
-  - Description: Specify the output ID for chat messages; this is necessary when multiple outputs are present.
- 
-- **chat_position:**
-  - Type: String
-  - Required: No
-  - Description: Determines the position of the chat window (top-left, top-center, top-right, center-left, center-right, bottom-right, bottom-center, bottom-left).
+**chat_position:**
+- Type: String
+- Required: No
+- Description: Determines the position of the chat window (top-left, top-center, top-right, center-left, center-right, bottom-right, bottom-center, bottom-left).
+- Example: "bottom-right"
 
-- **chat_trigger_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the chat trigger.
+**chat_trigger_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the chat trigger.
+- Example: `{ "backgroundColor": "#007bff", "color": "#fff" }`
 
-- **chat_window_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the overall chat window.
+**chat_window_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the overall chat window.
+- Example: `{ "borderRadius": "8px", "boxShadow": "0 2px 8px rgba(0,0,0,0.1)" }`
 
-- **error_message_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for error messages in the chat window.
+**error_message_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for error messages in the chat window.
+- Example: `{ "color": "#ff0000", "fontWeight": "bold" }`
 
-- **flow_id:**
-  - Type: String
-  - Required: Yes
-  - Description: Identifier for the flow associated with the component.
+**flow_id:**
+- Type: String
+- Required: Yes
+- Description: Identifier for the flow associated with the component.
+- Example: "123e4567-e89b-12d3-a456-426614174000"
 
-- **height:**
-  - Type: Number
-  - Required: No
-  - Description: Specifies the height of the chat window in pixels.
+**height:**
+- Type: Number
+- Required: No
+- Description: Specifies the height of the chat window in pixels.
+- Example: 500
 
-- **host_url:**
-  - Type: String
-  - Required: Yes
-  - Description: The URL of the host for communication with the chat component.
+**host_url:**
+- Type: String
+- Required: Yes
+- Description: The URL of the host for communication with the chat component.
+- Example: "https://my-langflow-instance.com"
 
-- **input_container_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the input container where chat messages are typed.
+**input_container_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the input container where chat messages are typed.
+- Example: `{ "padding": "10px", "backgroundColor": "#fafafa" }`
 
-- **input_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the chat input field.
+**input_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the chat input field.
+- Example: `{ "border": "1px solid #ccc", "borderRadius": "4px" }`
 
-- **Online:**
-  - Type: Boolean
-  - Required: No
-  - Description: Indicates if the chat component is online or offline.
+**online:**
+- Type: Boolean
+- Required: No
+- Description: Indicates if the chat component is online or offline.
+- Example: true
 
-- **start_open:**
-  - Type: Boolean
-  - Required: No
-  - Description: Indicates if the chat window should be open by default.
+**start_open:**
+- Type: Boolean
+- Required: No
+- Description: Indicates if the chat window should be open by default.
+- Example: false
 
-- **online_message:**
-  - Type: String
-  - Required: No
-  - Description: Custom message to display when the chat component is online.
+**online_message:**
+- Type: String
+- Required: No
+- Description: Custom message to display when the chat component is online.
+- Example: "Chat is online!"
 
-- **placeholder:**
-  - Type: String
-  - Required: No
-  - Description: Placeholder text for the chat input field.
+**placeholder:**
+- Type: String
+- Required: No
+- Description: Placeholder text for the chat input field.
+- Example: "Type your message..."
 
-- **placeholder_sending:**
-  - Type: String
-  - Required: No
-  - Description: Placeholder text to display while a message is being sent.
+**placeholder_sending:**
+- Type: String
+- Required: No
+- Description: Placeholder text to display while a message is being sent.
+- Example: "Sending..."
 
-- **send_button_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the send button in the chat window.
+**send_button_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the send button in the chat window.
+- Example: `{ "backgroundColor": "#28a745", "color": "#fff" }`
 
-- **send_icon_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for the send icon in the chat window.
+**send_icon_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for the send icon in the chat window.
+- Example: `{ "fontSize": "18px" }`
 
-- **tweaks:**
-  - Type: JSON
-  - Required: No
-  - Description: Additional custom tweaks for the associated flow.
+**tweaks:**
+- Type: JSON
+- Required: No
+- Description: Additional custom tweaks for the associated flow.
+- Example: `{ "api_key": "sk-xxxx", "temperature": 0.7 }`
 
-- **user_message_style:**
-  - Type: JSON
-  - Required: No
-  - Description: Styling options for formatting user messages in the chat window.
+**user_message_style:**
+- Type: JSON
+- Required: No
+- Description: Styling options for formatting user messages in the chat window.
+- Example: `{ "color": "#222", "backgroundColor": "#e0ffe0" }`
 
-- **resizable:**
-  - Type: Boolean
-  - Required: No
-  - Default: false
-  - Description: Enables or disables the ability to resize the chat window.
+**resizable:**
+- Type: Boolean
+- Required: No
+- Default: false
+- Description: Enables or disables the ability to resize the chat window.
+- Example: true
 
-- **min_width:**
-  - Type: Number
-  - Required: No
-  - Default: 300
-  - Description: Specifies the minimum width in pixels when resizing the chat window.
+**min_width:**
+- Type: Number
+- Required: No
+- Default: 300
+- Description: Specifies the minimum width in pixels when resizing the chat window.
+- Example: 300
 
-- **min_height:**
-  - Type: Number
-  - Required: No
-  - Default: 400
-  - Description: Specifies the minimum height in pixels when resizing the chat window.
+**min_height:**
+- Type: Number
+- Required: No
+- Default: 400
+- Description: Specifies the minimum height in pixels when resizing the chat window.
+- Example: 400
 
-- **max_width:**
-  - Type: Number
-  - Required: No
-  - Default: 2000
-  - Description: Specifies the maximum width in pixels when resizing the chat window.
+**max_width:**
+- Type: Number
+- Required: No
+- Default: 2000
+- Description: Specifies the maximum width in pixels when resizing the chat window.
+- Example: 800
 
-- **max_height:**
-  - Type: Number
-  - Required: No
-  - Default: 2000
-  - Description: Specifies the maximum height in pixels when resizing the chat window.
+**max_height:**
+- Type: Number
+- Required: No
+- Default: 2000
+- Description: Specifies the maximum height in pixels when resizing the chat window.
+- Example: 1000
 
-- **width:**
-  - Type: Number
-  - Required: No
-  - Description: Specifies the width of the chat window in pixels.
+**width:**
+- Type: Number
+- Required: No
+- Description: Specifies the width of the chat window in pixels.
+- Example: 350
 
-- **window_title:**
-  - Type: String
-  - Required: No
-  - Description: Title for the chat window, displayed in the header or title bar.
+**window_title:**
+- Type: String
+- Required: No
+- Description: Title for the chat window, displayed in the header or title bar.
+- Example: "Support Chat"
 
-- **session_id:**
-  - Type: String
-  - Required: No
-  - Description: Custom session id to override the random session id used as default.
+**session_id:**
+- Type: String
+- Required: No
+- Description: Custom session id to override the random session id used as default.
+- Example: "user-session-001"
 
-- **additional_headers:**
-  - Type: JSON
-  - Required: No
-  - Description: Additional headers to be sent to Langflow server
+**additional_headers:**
+- Type: JSON
+- Required: No
+- Description: Additional headers to be sent to Langflow server
+- Example: `{ "X-Custom-Header": "value" }`
 
 ## Contributing
 Contributions are welcome! Please follow the details below on how to get started.
