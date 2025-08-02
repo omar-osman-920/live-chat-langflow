@@ -6,6 +6,21 @@ import ChatMessage from "./chatMessage";
 import { sendMessage } from "../../controllers";
 import ChatMessagePlaceholder from "../../chatPlaceholder";
 
+// Import the FlowResponse interface to use with typed responses
+interface FlowResponse {
+  data: {
+      outputs?: Array<{
+          outputs: {
+              [key: string]: {
+                  type: string;
+                  value: string;
+              }
+          }
+      }>;
+      session_id?: string;
+  };
+}
+
 export default function ChatWindow({
   api_key,
   flowId,
@@ -42,7 +57,8 @@ export default function ChatWindow({
   min_width = 300,
   min_height = 400,
   max_width = 800,
-  max_height = 900
+  max_height = 900,
+  streaming = true
 }: {
   api_key?: string;
   output_type: string,
@@ -80,6 +96,7 @@ export default function ChatWindow({
   min_height?: number;
   max_width?: number;
   max_height?: number;
+  streaming?: boolean;
 
 }) {
   const [value, setValue] = useState<string>("");
@@ -101,6 +118,10 @@ export default function ChatWindow({
   const resizeStartPos = useRef({ x: 0, y: 0 });
   const initialSize = useRef({ width: width, height: height });
   
+  // Streaming state variables
+  const [streamingMessage, setStreamingMessage] = useState<string>("");
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
+  
   useEffect(() => {
     if (triggerRef)
       setWindowPosition(
@@ -120,56 +141,65 @@ export default function ChatWindow({
   function handleClick() {
     if (value && value.trim() !== "") {
       addMessage({ message: value, isSend: true });
-      setSendingMessage(true);
       setValue("");
-      sendMessage(hostUrl, flowId, value, input_type, output_type, sessionId, output_component, tweaks, api_key, additional_headers)
-        .then((res) => {
-          if (
-            res.data &&
-            res.data.outputs &&
-            Object.keys(res.data.outputs).length > 0 &&
-            res.data.outputs[0].outputs && res.data.outputs[0].outputs.length > 0
-          ) {
-            const flowOutputs: Array<any> = res.data.outputs[0].outputs;
-            if (output_component &&
-              flowOutputs.map(e => e.component_id).includes(output_component)) {
-              Object.values(flowOutputs.find(e => e.component_id === output_component).outputs).forEach((output: any) => {
-                addMessage({
-                  message: extractMessageFromOutput(output),
-                  isSend: false,
-                });
-              })
-            } else if (
-              flowOutputs.length === 1
-            ) {
-              Object.values(flowOutputs[0].outputs).forEach((output: any) => {
-                addMessage({
-                  message: extractMessageFromOutput(output),
-                  isSend: false,
-                });
-              })
-            } else {
-              flowOutputs
-                .sort((a, b) => {
-                  // Get the earliest timestamp from each flowOutput's outputs
-                  const aTimestamp = Math.min(...Object.values(a.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
-                  const bTimestamp = Math.min(...Object.values(b.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
-                  return aTimestamp - bTimestamp; // Sort descending (newest first)
-                })
-                .forEach((flowOutput) => {
-                  Object.values(flowOutput.outputs).forEach((output: any) => {
-                    addMessage({
-                      message: extractMessageFromOutput(output),
-                      isSend: false,
-                    });
-                  });
-                });
-            }
-          }
+      
+      if (streaming) {
+        // Start with empty streaming message
+        setStreamingMessage("");
+        setIsStreaming(true);
+        
+        // Create a message ID for this message to track updates
+        const messageId = Date.now().toString();
+        
+        // Add an empty bot message that will be updated
+        addMessage({ 
+          message: "",  // Start with empty message
+          isSend: false,
+          id: messageId,  // Add an ID to identify this message for updates
+          isStreaming: true
+        });
+        
+        // Define streaming update handler
+        const handleStreamUpdate = (chunk: string) => {
+          setStreamingMessage(prev => {
+            const newContent = prev + chunk;
+            // Update the last message with new content
+            updateLastMessage({ 
+              message: newContent, 
+              isSend: false,
+              id: messageId,
+              isStreaming: true
+            });
+            return newContent;
+          });
+        };
+        
+        sendMessage(
+          hostUrl, 
+          flowId, 
+          value, 
+          input_type, 
+          output_type, 
+          sessionId, 
+          output_component, 
+          tweaks, 
+          api_key, 
+          additional_headers,
+          true, // Enable streaming
+          handleStreamUpdate
+        )
+        .then((res: FlowResponse) => {
           if (res.data && res.data.session_id) {
             sessionId.current = res.data.session_id;
           }
-          setSendingMessage(false);
+          // Mark message as no longer streaming when done
+          updateLastMessage({ 
+            message: streamingMessage, 
+            isSend: false,
+            id: messageId,
+            isStreaming: false
+          });
+          setIsStreaming(false);
         })
         .catch((err) => {
           const response = err.response;
@@ -192,8 +222,85 @@ export default function ChatWindow({
             });
           }
           console.error(err);
-          setSendingMessage(false);
+          setIsStreaming(false);
         });
+      } else {
+        // Original non-streaming behavior
+        setSendingMessage(true);
+        sendMessage(hostUrl, flowId, value, input_type, output_type, sessionId, output_component, tweaks, api_key, additional_headers)
+          .then((res: FlowResponse) => {
+            if (
+              res.data &&
+              res.data.outputs &&
+              Object.keys(res.data.outputs).length > 0 &&
+              res.data.outputs[0].outputs && 
+              Object.keys(res.data.outputs[0].outputs).length > 0
+            ) {
+              const flowOutputs: Array<any> = res.data.outputs;
+              if (output_component &&
+                flowOutputs.map(e => e.component_id).includes(output_component)) {
+                Object.values(flowOutputs.find(e => e.component_id === output_component).outputs).forEach((output: any) => {
+                  addMessage({
+                    message: extractMessageFromOutput(output),
+                    isSend: false,
+                  });
+                })
+              } else if (
+                flowOutputs.length === 1
+              ) {
+                Object.values(flowOutputs[0].outputs).forEach((output: any) => {
+                  addMessage({
+                    message: extractMessageFromOutput(output),
+                    isSend: false,
+                  });
+                })
+              } else {
+                flowOutputs
+                  .sort((a, b) => {
+                    // Get the earliest timestamp from each flowOutput's outputs
+                    const aTimestamp = Math.min(...Object.values(a.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
+                    const bTimestamp = Math.min(...Object.values(b.outputs).map((output: any) => Date.parse(output.message?.timestamp)));
+                    return aTimestamp - bTimestamp; // Sort descending (newest first)
+                  })
+                  .forEach((flowOutput) => {
+                    Object.values(flowOutput.outputs).forEach((output: any) => {
+                      addMessage({
+                        message: extractMessageFromOutput(output),
+                        isSend: false,
+                      });
+                    });
+                  });
+              }
+            }
+            if (res.data && res.data.session_id) {
+              sessionId.current = res.data.session_id;
+            }
+            setSendingMessage(false);
+          })
+          .catch((err) => {
+            const response = err.response;
+            if (err.code === "ERR_NETWORK") {
+              updateLastMessage({
+                message: "Network error",
+                isSend: false,
+                error: true,
+              });
+            } else if (
+              response &&
+              response.status === 500 &&
+              response.data &&
+              response.data.detail
+            ) {
+              updateLastMessage({
+                message: response.data.detail,
+                isSend: false,
+                error: true,
+              });
+            }
+            console.error(err);
+            setSendingMessage(false);
+          });
+      }
     }
   }
 
@@ -341,9 +448,10 @@ export default function ChatWindow({
               message={message.message}
               isSend={message.isSend}
               error={message.error}
+              isStreaming={message.isStreaming}
             />
           ))}
-          {sendingMessage && (
+          {sendingMessage && !streaming && (
             <ChatMessagePlaceholder bot_message_style={bot_message_style} />
           )}
           <div ref={lastMessage}></div>
@@ -356,22 +464,22 @@ export default function ChatWindow({
               if (e.key === "Enter") handleClick();
             }}
             type="text"
-            disabled={sendingMessage}
-            placeholder={sendingMessage ? (placeholder_sending || "Thinking...") : (placeholder || "Type your message...")}
+            disabled={sendingMessage || isStreaming}
+            placeholder={(sendingMessage || isStreaming) ? (placeholder_sending || "Thinking...") : (placeholder || "Type your message...")}
             style={input_style}
             ref={inputRef}
             className="cl-input-element"
           />
           <button
             style={send_button_style}
-            disabled={sendingMessage}
+            disabled={sendingMessage || isStreaming}
             onClick={handleClick}
           >
             <Send
               style={send_icon_style}
               className={
                 "cl-send-icon " +
-                (!sendingMessage
+                (!(sendingMessage || isStreaming)
                   ? "cl-notsending-message"
                   : "cl-sending-message")
               }

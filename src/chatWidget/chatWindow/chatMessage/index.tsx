@@ -7,6 +7,7 @@ export default function ChatMessage({
   message,
   isSend,
   error,
+  isStreaming,
   user_message_style,
   bot_message_style,
   error_message_style,
@@ -29,12 +30,13 @@ export default function ChatMessage({
       ) : (
         <div style={bot_message_style} className={"cl-bot_message"}>
           <Markdown 
-          className={"markdown-body prose flex flex-col word-break-break-word"}
-          remarkPlugins={[remarkGfm]}
+            className={"markdown-body prose flex flex-col word-break-break-word"}
+            remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeMathjax]}
           >
             {message}
           </Markdown>
+          {isStreaming && <span className="typing-indicator">▌</span>}
         </div>
       )}
     </div>

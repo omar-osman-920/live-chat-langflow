@@ -38,6 +38,7 @@ export default function ChatWidget({
   min_height,
   max_width,
   max_height,
+  streaming=true,
 }: {
   api_key?: string;
   input_value: string,
@@ -73,6 +74,7 @@ export default function ChatWidget({
   min_height?: number;
   max_width?: number;
   max_height?: number;
+  streaming?: boolean;
 }) {
   const [open, setOpen] = useState(start_open);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -944,6 +946,17 @@ input:-ms-input-placeholder { /* Internet Explorer 10-11 */
 
 input::-ms-input-placeholder { /* Microsoft Edge */
   color: rgb(156 163 175);
+}
+
+.typing-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
 }
     `;
 
@@ -2211,6 +2224,7 @@ input::-ms-input-placeholder { /* Microsoft Edge */
         min_height={min_height}
         max_width={max_width}
         max_height={max_height}
+        streaming={streaming}
       />
     </div>
   );
